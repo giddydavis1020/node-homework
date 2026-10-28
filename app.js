@@ -1,6 +1,8 @@
 
 const express = require("express");
 const timeRouter = require("./routes/timeRoutes");
+const authMiddleware = require("./middleware/auth");
+const taskRouter = require("./routes/taskRoutes");
 
 // assignment 3 imports
 const userRoutes = require("./routes/userRoutes");
@@ -32,6 +34,9 @@ app.post("/testpost", (req, res) => {
 
 // assignment 3 user routes
 app.use("/api/users", userRoutes);
+
+// assignment 4 protected task routes
+app.use("/api/tasks", authMiddleware, taskRouter);
 
 // handle routes that don't exist
 app.use(notFound);
