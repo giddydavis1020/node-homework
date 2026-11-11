@@ -5,7 +5,7 @@ const prisma = require("../db/prisma");
 
 const scrypt = util.promisify(crypto.scrypt);
 
-// Hash a password before storing it
+// hash a password before storing it
 const hashPassword = async (password) => {
     const salt = crypto.randomBytes(16).toString("hex");
     const derivedKey = await scrypt(password, salt, 64);
@@ -13,7 +13,7 @@ const hashPassword = async (password) => {
     return `${salt}:${derivedKey.toString("hex")}`;
 };
 
-// Compare a login password with the stored hash
+// compare a login password with the stored hash
 const comparePassword = async (inputPassword, storedHash) => {
     if (typeof storedHash !== "string") {
         return false;
@@ -31,7 +31,7 @@ const comparePassword = async (inputPassword, storedHash) => {
     return crypto.timingSafeEqual(derivedKey, storedKey);
 };
 
-// Register a new user using Prisma
+// register a new user using Prisma
 const register = async (req, res, next) => {
     const { error, value } = userSchema.validate(req.body || {}, {
         abortEarly: false
@@ -79,7 +79,7 @@ const register = async (req, res, next) => {
     }
 };
 
-// Log in an existing user using Prisma
+// log in an existing user using Prisma
 const logon = async (req, res, next) => {
     let { email, password } = req.body || {};
 
@@ -91,7 +91,7 @@ const logon = async (req, res, next) => {
     }
 
     try {
-        // Convert email to lowercase before searching
+        // convert email to lowercase before searching
         email = email.toLowerCase();
 
         const user = await prisma.user.findUnique({
@@ -116,7 +116,7 @@ const logon = async (req, res, next) => {
     }
 };
 
-// Log out the current user
+// log out the current user
 const logoff = (req, res) => {
     global.user_id = null;
     return res.sendStatus(200);
