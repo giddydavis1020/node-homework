@@ -1,24 +1,20 @@
-
 const express = require("express");
 const prisma = require("./db/prisma");
 const timeRouter = require("./routes/timeRoutes");
 const authMiddleware = require("./middleware/auth");
 const taskRouter = require("./routes/taskRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
-// assignment 3 imports
 const userRoutes = require("./routes/userRoutes");
 const notFound = require("./middleware/not-found");
 const errorHandler = require("./middleware/error-handler");
 
 const app = express();
 
-// assignment 5 uses PostgreSQL for users and tasks
 global.user_id = null;
 
-// parse JSON requests
 app.use(express.json());
 
-// assignment 2 routes
 app.use("/api", timeRouter);
 
 app.get("/", (req, res) => {
@@ -31,7 +27,6 @@ app.post("/testpost", (req, res) => {
   });
 });
 
-// database health check using Prisma
 app.get("/health", async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -45,26 +40,19 @@ app.get("/health", async (req, res) => {
   }
 });
 
-// assignment 3 user routes
 app.use("/api/users", userRoutes);
-
-// assignment 4 protected task routes
 app.use("/api/tasks", authMiddleware, taskRouter);
+app.use("/api/analytics", authMiddleware, analyticsRoutes);
 
-// handle routes that don't exist
 app.use(notFound);
-
-// handle server errors
 app.use(errorHandler);
 
-// start server
 const port = process.env.PORT || 3000;
 
 const server = app.listen(port, () => {
   console.log(`Server is listening on port ${port}...`);
 });
 
-// graceful shutdown
 let isShuttingDown = false;
 
 async function shutdown(code = 0) {
@@ -82,7 +70,6 @@ async function shutdown(code = 0) {
     });
 
     console.log("HTTP server closed.");
-    
   } catch (err) {
     console.error("Error during shutdown:", err);
     code = 1;
