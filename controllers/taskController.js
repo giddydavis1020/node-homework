@@ -38,8 +38,8 @@ exports.create = async (req, res, next) => {
     });
   }
 
-  if (!global.user_id) {
-    return res.status(401).json({ message: "Unauthorized" });
+  if (!req.user?.id) {
+    throw new TypeError("User ID is required");
   }
 
   try {
@@ -48,7 +48,7 @@ exports.create = async (req, res, next) => {
         title: value.title,
         isCompleted: value.isCompleted,
         priority: value.priority,
-        userId: global.user_id
+        userId: req.user.id
       },
       select: {
         id: true,
@@ -65,7 +65,7 @@ exports.create = async (req, res, next) => {
 };
 
 exports.bulkCreate = async (req, res, next) => {
-  if (!global.user_id) {
+  if (!req.user?.id) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -93,7 +93,7 @@ exports.bulkCreate = async (req, res, next) => {
       title: value.title,
       isCompleted: value.isCompleted || false,
       priority: value.priority || "medium",
-      userId: global.user_id
+      userId: req.user.id
     });
   }
 
@@ -114,7 +114,7 @@ exports.bulkCreate = async (req, res, next) => {
 };
 
 exports.index = async (req, res, next) => {
-  if (!global.user_id) {
+  if (!req.user?.id) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -144,7 +144,7 @@ exports.index = async (req, res, next) => {
     return res.status(400).json({ error: "Page is too large" });
   }
 
-  const whereClause = { userId: global.user_id };
+  const whereClause = { userId: req.user.id };
 
   if (find) {
     whereClause.title = {
@@ -185,7 +185,7 @@ exports.index = async (req, res, next) => {
 };
 
 exports.show = async (req, res, next) => {
-  if (!global.user_id) {
+  if (!req.user?.id) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -199,7 +199,7 @@ exports.show = async (req, res, next) => {
     const task = await prisma.task.findUnique({
       where: {
         id,
-        userId: global.user_id
+        userId: req.user.id
       },
       select: taskWithUserSelect
     });
@@ -226,7 +226,7 @@ exports.update = async (req, res, next) => {
     });
   }
 
-  if (!global.user_id) {
+  if (!req.user?.id) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -244,7 +244,7 @@ exports.update = async (req, res, next) => {
     const task = await prisma.task.update({
       where: {
         id,
-        userId: global.user_id
+        userId: req.user.id
       },
       data: value,
       select: {
@@ -266,7 +266,7 @@ exports.update = async (req, res, next) => {
 };
 
 exports.deleteTask = async (req, res, next) => {
-  if (!global.user_id) {
+  if (!req.user?.id) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -280,7 +280,7 @@ exports.deleteTask = async (req, res, next) => {
     const task = await prisma.task.delete({
       where: {
         id,
-        userId: global.user_id
+        userId: req.user.id
       },
       select: {
         id: true,
